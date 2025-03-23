@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Mark Attendance</title>
+    <link rel="stylesheet" href="signUP.css">
+  </head>
+  <body onload="displayNAV()">
+    <div class="nav-bar">
+      <img class="logo" src="logo.webp">
+      <h1 class="title">ATTENDANCE UYO</h1>
+      <img class="profile" src="profile.jpeg" onClick = 'toogleRealTimePage()'>
+    </div>
+    <div class="container2">
+      <img src="UYO.jpg" class="school-logo">
+      <form class="form">
+        <input type="text" placeholder="Enter name ..." class="input-field">
+        <select class="input-field" style="height:52px;border:2px inset black;">
+          <option>COMPUTER ENGINEERING</option>
+          <option>GEOLOGY</option>
+          <option>MECHANICAL ENGINEERING</option>
+          <option>ELECTRICAL ENGINEERING</option>
+        </select>
+        <input type="text" placeholder="Enter Reg number ..." class="input-field">
+        <span style="color:blue;">
+          <canvas id="canvas" width="300" height="100" style="border:2px solid black;"></canvas><br>Signature <button type="button" id="clearCanvasBtn">Clear</button>
+        </span>
+        
+        <button type="submit" class="submit-button">Submit Attendance</button>
+        
+      </form>
+    </div>
+    <div class="class-attendance">
+      <div class="list-title">CLASS ATTENDANCE LIST
+      </div>
+    </div>
+      
+    <script src="Attendance.js"></script>
+  </body>
+</html>

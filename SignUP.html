@@ -6,7 +6,7 @@
     <title>sign up Attendance</title>
     <link rel="stylesheet" href="signUP.css">
   </head>
-  <body onload="displayNAV()">
+  <body>
     <div class="nav-bar">
       <img class="logo" src="logo.webp">
       <h1 class="title">ATTENDANCE UYO</h1>
@@ -36,8 +36,8 @@
     </div>
     <div class="container">
       <img src="UYO.jpg" class="school-logo">
-      <form class="form">
-        <input type="text" placeholder="Enter name ..." class="input-field">
+      <form class="form" action="/Page.html">
+        <input type="text" placeholder="Enter name ..." class="input-field" required="true">
         <select class="input-field" style="height:52px;border:2px inset black;">
           <option>COMPUTER ENGINEERING</option>
           <option>GEOLOGY</option>
@@ -55,6 +55,7 @@
       <br>
     </div>
     <span class="terms-condition"><input type="checkbox" id="check-box">Click box agree to our <a href="termsCondition.html">terms and condition</a></span>
-    <script src="SignUP.js"></script>
+    <script type="module" src="SignUP.js"></script>
+    <script type="module" src="firebaseConfig.js"></script>
   </body>
 </html>

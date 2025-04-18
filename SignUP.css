@@ -69,11 +69,11 @@ html,body{
 }
 .container2{
   width: 87%;
-  height: 700px;
+  height: 650px;
   border: 2px solid yellow;
   border-radius: 7px;
   margin: auto auto;
-  margin-top: 55px;
+  margin-top: 20px;
   padding: 10px;
   text-align: center;
 }
@@ -103,6 +103,20 @@ html,body{
   font-size: 18px;
 }
 
+.classDisplay{
+  margin: 0;
+  padding: 2px;
+  width: 60px;
+  margin: auto auto;
+  margin-top: 55px;
+  height: 30px;
+  line-height: 30px;
+  border: 2px outset green;
+  border-radius: 5px;
+  background-image: linear-gradient(#e4e4e4,#b5b5b5);
+  text-align: center;
+}
+
 .school-logo{
   display: block;
   margin: 0;
@@ -122,18 +136,20 @@ html,body{
   padding: 10px;
   width: 320px;
   margin: auto auto;
-  margin-top: 40px;
+  margin-top: 30px;
   height: 50px;
   font-size: 25px;
   transition-duration: 1s;
 }
 .submit-button{
   display: block;
+  width: 90%;
   background-color: blue;
   color: white;
   text-align: center;
   margin: 0;
-  margin-top: 10px;
+  margin: auto auto;
+  margin-top: 20px;
   padding: 10px;
   height: 50px;
   font-size: 25px;
@@ -159,6 +175,25 @@ html,body{
   height: 100px;
   border: 2px solid black;
   touch-action: none;
+}
+#clearCanvasBtn{
+  width: 80px;
+  height: 30px;
+  padding: 3px;
+  background-color: black;
+  color: white;
+  font-size: 17px;
+}
+#clearCanvasBtn:hover{
+  background-color: #373636;
+}
+
+#indicator{
+  width: 17px;
+  height: 17px;
+  border-radius: 100%;
+  background-color: #46ef46;
+  border: 2px solid gray;
 }
 
 span {
@@ -190,7 +225,6 @@ span {
   color: blue;
   font-size: 20px;
   font-weight: 500;
-  border: 2px solid blue;
   padding: 5px;
 }
 

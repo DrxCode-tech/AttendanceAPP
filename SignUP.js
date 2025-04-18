@@ -1,159 +1,160 @@
-//Sign In JavaScript programmes...
+import { db } from "./firebaseConfig.js";
+import { collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-firestore.js";
 
-//initializing input fields...
+// Function to add a user to Firestore
+async function addUser(name, regNumber, department) {
+  try {
+    await addDoc(collection(db, "users"), {
+      name,
+      regNumber,
+      department,
+      timestamp: new Date()
+    });
+    alert("User added successfully!");
+    window.location.href = 'Attendance.html';
+  } catch (error) {
+    alert("Error adding user: " + error.message);
+  }
+}
+
+// Function to check if a user exists before adding
+async function checkAndAddUser(name, regNumber, department) {
+  try {
+    const userRef = collection(db, 'users');
+    const q = query(userRef, where("regNumber", "==", regNumber));
+    const querySnapshot = await getDocs(q);
+
+    let userExists = false;
+    querySnapshot.forEach((doc) => {
+      if (doc.data().regNumber === regNumber) {
+        userExists = true;
+      }
+    });
+
+    if (userExists) {
+      alert("User has already signed in!");
+      window.location.href = 'Attendance.html';
+    } else {
+      displayDialogBox(name, regNumber, department);
+    }
+  } catch (error) {
+    alert("Error checking user: " + error);
+  }
+}
+
+// Input Fields
 const inputs = document.querySelectorAll(".input-field");
-const name = inputs[0];
-const RegNo = inputs[2];
-const level = inputs[3];
+const nameInput = inputs[0];
+const departmentInput = inputs[1];
+const regNoInput = inputs[2];
+const levelInput = inputs[3];
 const checkBox = document.getElementById('check-box');
-let timeState = document.getElementById('countdown').textContent;
 const dialogBox = document.querySelector('.dialogBox');
 
-//initializing database terms...
-const db = window.localStorage;
-const database = JSON.parse(db.getItem('database'))|| new Map();
-
-function displayNAV(){
+// Display Navigation Bar
+function displayNAV() {
   const navBar = document.querySelector(".nav-bar");
-  navBar.style.top= "0%"
+  if (navBar) {
+    navBar.style.top = "0%";
+  } else {
+    console.error("Navbar element not found!");
+  }
 }
 
-function checkInputs(a,b,c,d){
-  let states = [a,b,c];
-  let worning;
-  states.forEach((inputspace,i)=>{
-    if(!inputspace.value){
-      if(i == 0){
-        worning = 'Pls...,make sure to enter full name ';
-      }
-      else if(i == 1){
-        worning += '...,make sure to enter registration number! ';
-      }
-      else if(i == 2){
-        worning += "...,make sure to enter course level";
-      }
-    }
-    else if(inputspace.value){
-      if(i == 2 &&(inputspace.value < 100 || inputspace.value > 500)){
-        worning += "...,make sure to enter course level between 100-500";
-      }
-    }
-    
-  });
-  if(worning && !d.checked){
-    alert(worning+' and pls...,agree to our terms and condition by clicking the box!!!');
-  }
-  else if(!d.checked){
-    alert('pls...,agree to our terms and condition by clicking the box!!!');
-  }
-  else if(worning){
-    alert(worning);
-  }
-  else{
-    displayDialogBox(a, inputs[1], b, c);
-  }
+// Ensure the navigation loads properly
+document.addEventListener("DOMContentLoaded", () => {
+  displayNAV();
+});
 
+// Validate Inputs
+async function checkInputs() {
+  let warning = "";
+
+  if (!nameInput.value) warning += "Enter full name.\n";
+  if (!regNoInput.value) warning += "Enter registration number.\n";
+  if (!levelInput.value || levelInput.value < 100 || levelInput.value > 500) warning += "Enter course level (100-500).\n";
+  if (!checkBox.checked) warning += "Agree to terms and conditions.\n";
+
+  if (warning) {
+    alert(warning);
+  } else {
+    await checkAndAddUser(nameInput.value, regNoInput.value, departmentInput.value);
+  }
 }
 
-function displayDialogBox(a,k,b,c){
+// Display Confirmation Dialog
+function displayDialogBox(name, regNo, department) {
+  document.getElementById('studentcheck-list').innerHTML = `
+    <div>
+      <p>Name: ${name}</p>
+      <p>Reg No: ${regNo}</p>
+      <p>Department: ${department}</p>
+    </div>`;
   
-  document.getElementById('studentcheck-list').innerHTML = `<div><p>${a.value}</p><p>${k.value}</p><p>${b.value}</p><p>${c.value}</p></div>`;
-  dialogBox.style.display ='block';
-  timeState = 3;
-  interval(timeState);
+  dialogBox.style.display = 'block';
+  let timeLeft = 3;
+  countdownInterval(timeLeft);
 }
-  
-function interval(a){
-  const interState = setInterval(()=>{
-    if(a <= 0){
+
+// Countdown Timer
+function countdownInterval(timeLeft) {
+  const countdownElem = document.getElementById('countdown');
+  const timer = setInterval(() => {
+    if (timeLeft <= 0) {
+      clearInterval(timer);
       remove(dialogBox);
-      a = 3;
-      clearInterval(interState);
-      getPromise().then((data)=>{
-        alert(data);
-      }).catch((error)=>{
-        alert(error);
-      });
+      submitUser();
+    } else {
+      timeLeft--;
+      countdownElem.textContent = timeLeft;
     }
-    else{
-      a--
-      document.getElementById('countdown').textContent = a;
-    }
-  },1000)
-  document.querySelector('.dialog-cancleButton').addEventListener('click',()=>{
-    clearInterval(interState);
+  }, 1000);
+
+  document.querySelector('.dialog-cancleButton').addEventListener('click', () => {
+    clearInterval(timer);
     remove(dialogBox);
-  })
-}
-
-//submitting function...
-function getPromise(){
-  return new Promise((res,rej)=>{
-    alert('Submitting form...');
-    let state = true
-    
-    setTimeout(()=>{
-      if(state){
-        res(storageProgrammes(name,inputs[1],RegNo,level,alert));
-      }
-      else{
-        rej('error...')
-      }
-    },2000)
-    
-  })
-}
-
-//function that displays the attendance list in page.html
-function disAttendancePage(a){
-  let data = [];
-  database.forEach((value,key)=>{
-    document.getElementById('demo-space').innerHTML+= `<li>${value}</li>`;
-    data.push(value);
   });
- a(data);
 }
 
-//section for database systems and storage...
-function storageProgrammes(a,b,c,d,e){
-  let i = database.length;
-  database.set(i,[a.value,b.value,c.value,d.value]);
-  db.setItem('database',JSON.stringify(Array.from(database.entries())));
-  e('Submitted successfully ✅️');
-  disAttendancePage(alert);
+// Submit User Data
+async function submitUser() {
+  alert("Submitting form...");
+  try {
+    await addUser(nameInput.value, regNoInput.value, departmentInput.value);
+  } catch (error) {
+    alert("Error submitting user: " + error);
+  }
 }
 
-//removing function p
-function remove(elem){
+// Remove Element
+function remove(elem) {
   elem.style.display = "none";
 }
 
+// Sign In Button Click Event
+document.querySelector('.sign-button').addEventListener('click', checkInputs);
 
-//initializing button...
-document.querySelector('.sign-button').addEventListener('click',()=>{
-  checkInputs(name,RegNo,level,checkBox);
-  document.getElementById('countdown').textContent = 3;
-  
-})
+// Side Navigation Controls
+const listButton = document.querySelector('.list');
+const cancelButton = document.querySelector('.cancle');
 
-document.querySelector('.list').addEventListener('click',()=>{
-  document.querySelector('.slide-show').style.width ='300px';
-})
-document.querySelector('.cancle').addEventListener('click',()=>{
-  document.querySelector('.slide-show').style.width ='0px';
-})
+if (listButton && cancelButton) {
+  listButton.addEventListener('click', () => {
+    document.querySelector('.slide-show').style.width = '300px';
+  });
+  cancelButton.addEventListener('click', () => {
+    document.querySelector('.slide-show').style.width = '0px';
+  });
+} else {
+  console.error("Slide show elements not found!");
+}
 
-const toggleElems = document.querySelectorAll('.toogle');
-const contentTogElems = document.querySelectorAll('.content');
+// Toggle FAQ Sections
+const toggles = document.querySelectorAll('.toogle');
+const contents = document.querySelectorAll('.content');
 
-toggleElems.forEach((toggle, i) => {
+toggles.forEach((toggle, i) => {
   toggle.addEventListener('click', () => {
-    if (contentTogElems[i].style.height === '0px' || contentTogElems[i].style.height === '') {
-      contentTogElems[i].style.height =
-      contentTogElems[i].scrollHeight + 'px'; // Expand
-    } else {
-      contentTogElems[i].style.height = '0px'; // Collapse
-    }
+    contents[i].style.height = contents[i].style.height === '0px' ? contents[i].scrollHeight + 'px' : '0px';
   });
 });
-

@@ -11,7 +11,7 @@ async function addUser(name, regNumber, department) {
       timestamp: new Date()
     });
     alert("User added successfully!");
-    window.location.href = 'Attendance.html';
+    window.location.href = 'index.html';
   } catch (error) {
     alert("Error adding user: " + error.message);
   }

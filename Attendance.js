@@ -11,6 +11,40 @@ import {
 
 const userRef = collection(db, "users");
 
+//beginning of the new code i added
+//......Time system for button...
+let courseName;
+let endTime = 0;
+const DB = window.localStorage;
+let butSt = JSON.parse(DB.getItem('butSt')) || [false,endTime];
+
+function checkBut(){
+  const Day = new Date().getDay();
+  if(Day === 0 || Day === 6){
+    return;
+  }else{
+    if(submitButton.disabled){
+      const currtTime = new Date().getHours();
+      const differenceTime = butSt[1] - currtTime;
+      if(differenceTime <= 0){
+        butSt = [false,0];
+        buttonState(butSt[0]);
+        DB.setItem('butSt',JSON.stringify(butSt));
+        checkAttendanceState();
+        alert('A class is now active!');
+        return;
+      }
+    }
+  }
+}
+
+function changeMyState(timend){
+  butSt = [true,timend];
+  buttonState(butSt[0]);
+  alert('You have successfully marked Attendance and button has been disabled till next class..Thank You!');
+  DB.setItem('butSt',JSON.stringify(butSt));
+}
+
 // --- DOM Elements ---
 const submitButton = document.querySelector(".submit-button");
 const indicator = document.getElementById("indicator");
@@ -19,7 +53,12 @@ const userName = userInput[0];
 const userReg = userInput[1];
 const currentCourseDisplay = document.querySelector('.classDisplay');
 
-buttonState(false);
+buttonState(butSt[0]);
+let interval = setInterval(()=>{
+  checkBut();
+  checkAttendanceState();
+},1000);
+//....end of it...
 
 // --- Button State Control ---
 function buttonState(disabled) {
@@ -47,11 +86,19 @@ async function checkAndAddUser(name, regNumber, courseName) {
 }
 
 // --- Submit Attendance ---
-const now = new Date();
+
+
+function sanitizeName(str) {
+  return str.replace(/[^\w\d-_]/g, ''); // Keep only letters, digits, underscores, and hyphens
+}
 
 async function submitAttendance(name, regNumber, courseName) {
+  const now = new Date();
   const formattedDate = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
-  const collectionName = `${courseName}_${formattedDate}`;
+  
+  // Sanitize course name before using it in collection name
+  const safeCourseName = sanitizeName(courseName);
+  const collectionName = `${safeCourseName}_${formattedDate}`;
   const attendanceCollection = collection(db, collectionName);
 
   try {
@@ -62,22 +109,22 @@ async function submitAttendance(name, regNumber, courseName) {
       timestamp: now
     });
     alert(`Attendance successfully submitted for ${courseName}!`);
+    changeMyState(endTime); // Make sure endTime is defined elsewhere
   } catch (error) {
+    console.error(error);
     alert("Failed to submit attendance.");
   }
 }
 
 // --- Assign Course by Time ---
-function changeCourse(startHour, endHour, courseName) {
+function changeCourse(startHour, endHour, course) {
   const currentHour = new Date().getHours();
+  endTime = endHour;
   if (currentHour >= startHour && currentHour < endHour) {
-    if (currentCourseDisplay) currentCourseDisplay.textContent = courseName;
-    buttonState(false)
-    return courseName;
-  } else {
-    buttonState(true);
-    return;
-  }
+    if (currentCourseDisplay) currentCourseDisplay.textContent = course;
+    courseName = `attd-${course}`;
+    return ;
+  } 
 }
 
 // --- Validate & Submit ---
@@ -89,39 +136,43 @@ function checkInputs() {
 
   const name = userName.value.trim();
   const regNumber = userReg.value.trim();
-  const courseName = currentCourseDisplay.textContent;
 
   checkAndAddUser(name, regNumber, courseName);
 }
 
-// --- Time-based Attendance Activation ---
+// --- Time-based Attendance Activation ---00p1
 function checkAttendanceState() {
   const day = new Date().getDay();
   const hour = new Date().getHours();
-  buttonState(true);
+  
 
   switch (day) {
     case 1: // Monday
       if (hour >= 1 && hour < 10) changeCourse(1, 10, "PHY111");
       else if (hour >= 10 && hour < 12) changeCourse(10, 12, "PHY117");
-      else if (hour >= 13 && hour < 24) changeCourse(13, 24, "GST111");
+      else if (hour >= 13 && hour < 21) changeCourse(13, 21, "GST111");
+      else if (hour >= 21 && hour < 24) changeCourse(21, 24, "MTH111");
       break;
-    case 2: // Tuesday
-      if (hour >= 10 && hour < 12) changeCourse(10, 12, "PHY117");
+    case 3: // Tuesday
+      if (hour >= 7 && hour < 12) changeCourse(7, 12, "PHY117");
       else if (hour >= 15 && hour < 17) changeCourse(15, 17, "PHY117");
       break;
-    case 3: // Wednesday
-      if (hour >= 8 && hour < 10) return;
+    case 2: // Wednesday
+      if (hour >= 7 && hour < 10) changeCourse(7, 10, "PHY117");;
       break;
     case 4: // Thursday
-      if (hour >= 10 && hour < 17) changeCourse(10, 17, "PHY111");
-      else if (hour >= 17 && hour < 20) return;
+      if (hour >= 10 && hour < 12) changeCourse(10, 12, "PHY111");
+      else if (hour >= 14 && hour < 16) return;
       break;
     case 5: // Friday
       if (hour >= 0 && hour < 10) changeCourse(0, 10, "PHY111");
       else if (hour >= 10 && hour < 12) changeCourse(10, 12, "PHY117");
       else if (hour >= 12 && hour < 24) changeCourse(12, 24, "PHY117");
       break;
+    default :
+      buttonState(true);
+      alert('No classes today')
+      clearInterval(interval);
   }
 }
 
@@ -187,6 +238,7 @@ document.querySelector('.profile').addEventListener('click', () => {
 
 // --- Real-time Attendance Display ---
 function updateAttendanceDisplay() {
+  const now = new Date();
   const attdDisplay = document.querySelector('.class-attendance');
   const formattedDate = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
   const courseName = currentCourseDisplay.textContent;
@@ -222,3 +274,4 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 submitButton.addEventListener("pointerdown", checkInputs);
+

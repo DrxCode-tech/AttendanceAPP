@@ -122,7 +122,7 @@ function changeCourse(startHour, endHour, course) {
   endTime = endHour;
   if (currentHour >= startHour && currentHour < endHour) {
     if (currentCourseDisplay) currentCourseDisplay.textContent = course;
-    courseName = `attd-${course}`;
+    courseName = course;
     return ;
   } 
 }

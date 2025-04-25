@@ -274,4 +274,3 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 submitButton.addEventListener("pointerdown", checkInputs);
-Db.clear();

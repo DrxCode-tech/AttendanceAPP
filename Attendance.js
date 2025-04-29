@@ -273,4 +273,4 @@ document.addEventListener("DOMContentLoaded", () => {
   if (navBar) navBar.style.top = "0%";
 });
 
-submitButton.addEventListener("pointerdown", checkInputs);
+submitButton.addEventListener("click", checkInputs);

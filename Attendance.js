@@ -55,8 +55,8 @@ const currentCourseDisplay = document.querySelector('.classDisplay');
 
 buttonState(butSt[0]);
 let interval = setInterval(()=>{
-  checkBut();
   checkAttendanceState();
+  checkBut();
 },1000);
 //....end of it...
 

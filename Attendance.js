@@ -11,6 +11,8 @@ import {
 
 const userRef = collection(db, "users");
 
+
+
 //beginning of the new code i added
 //......Time system for button...
 let courseName;
@@ -55,8 +57,8 @@ const currentCourseDisplay = document.querySelector('.classDisplay');
 
 buttonState(butSt[0]);
 let interval = setInterval(()=>{
-  checkAttendanceState();
   checkBut();
+  checkAttendanceState();
 },1000);
 //....end of it...
 
@@ -167,7 +169,7 @@ function checkAttendanceState() {
     case 5: // Friday
       if (hour >= 0 && hour < 10) changeCourse(0, 10, "PHY111");
       else if (hour >= 10 && hour < 12) changeCourse(10, 12, "PHY117");
-      else if (hour >= 12 && hour < 23) changeCourse(12, 23, "PHY117");
+      else if (hour >= 12 && hour < 23) changeCourse(12, 23, "PHY112");
       break;
     default :
       buttonState(true);
@@ -271,6 +273,11 @@ document.addEventListener("DOMContentLoaded", () => {
   updateAttendanceDisplay();
   const navBar = document.querySelector(".nav-bar");
   if (navBar) navBar.style.top = "0%";
+  
+  submitButton.onclick = function(){
+    console.log('clicked!')
+    this.disabled ? alert('No class now!'): checkInputs()
+  }
 });
 
-submitButton.addEventListener("click", checkInputs);
+

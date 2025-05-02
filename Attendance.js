@@ -152,8 +152,8 @@ function checkAttendanceState() {
     case 1: // Monday
       if (hour >= 1 && hour < 10) changeCourse(1, 10, "PHY111");
       else if (hour >= 10 && hour < 12) changeCourse(10, 12, "PHY117");
-      else if (hour >= 13 && hour < 21) changeCourse(13, 21, "GST111");
-      else if (hour >= 21 && hour < 23) changeCourse(21, 23, "MTH111");
+      else if (hour >= 13 && hour < 16) changeCourse(13, 16, "GST111");
+      else if (hour >= 16 && hour < 18) changeCourse(16, 18, "MTH111");
       break;
     case 2: // Tuesday
       if (hour >= 7 && hour < 12) changeCourse(7, 12, "PHY117");
@@ -164,12 +164,12 @@ function checkAttendanceState() {
       break;
     case 4: // Thursday
       if (hour >= 10 && hour < 12) changeCourse(10, 12, "PHY111");
-      else if (hour >= 12 && hour < 23) changeCourse(12, 23, 'CPE113');
+      else if (hour >= 12 && hour < 18) changeCourse(12, 18, 'CPE113');
       break;
     case 5: // Friday
       if (hour >= 0 && hour < 10) changeCourse(0, 10, "PHY111");
       else if (hour >= 10 && hour < 12) changeCourse(10, 12, "PHY117");
-      else if (hour >= 12 && hour < 23) changeCourse(12, 23, "PHY112");
+      else if (hour >= 12 && hour < 15) changeCourse(12, 15, "PHY112");
       break;
     default :
       buttonState(true);
@@ -280,4 +280,4 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-
+DB.clear();

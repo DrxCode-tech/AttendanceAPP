@@ -280,4 +280,4 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-DB.clear();
+

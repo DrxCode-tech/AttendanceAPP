@@ -10,46 +10,42 @@ html,body{
   position: fixed;
   top: -100%;
   left: 0;
-  background-color: green;
+  background-image: linear-gradient(#035303,green);
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
+  align-items: center;
+  gap: 10px;
   transition-duration: 1.5s;
-  
+  width: 100%;
+  height: 70px;
 }
+
 
 /*styling image and list logo*/
 .logo{
-  display: inline-block;
-  width: 17%;
-  height: 17%;
+  flex: 0 1 18%;
+  border-radius: 100%;
+  border: 2px solid black;
+  height: 60px;
   margin: 0;
   padding: 0;
-  border-radius: 100%;
-  margin: auto auto;
 }
 
 .title{
-  margin: 0;
-  padding: 0;
-  padding-top: 15px;
+  flex: 0 2 33%;
   text-align: center;
-  color: white;
-  font-size: 25px;
   font-weight: 500;
   padding-left: 2px;
-  color: yellow;
-  height: 30px;
-  line-height: 30px;
+  color: #04d204;
 }
 
 .list,.profile{
-  display: inline-block;
-  width: 15%;
-  height: 15%;
+  flex: 0 1 18%;
+  border-radius: 10px;
+  border: 2px solid black;
+  height: 60px;
   margin: 0;
   padding: 0;
-  margin: auto auto;
-  border-radius: 6px;
 }
 
 .list-cont{
@@ -77,6 +73,7 @@ html,body{
   margin-top: 20px;
   padding: 10px;
   text-align: center;
+  
 }
 
 .form{
@@ -89,19 +86,21 @@ html,body{
 
 .input-field{
   display: block;
-  background-image: linear-gradient(#12a612,#04b804);
-  color: white;
+  background-image: linear-gradient(#12a612,#078007);
+  color: lightgreen;
   text-align: center;
   margin: 0;
   padding: 10px;
   height: 30px;
   border-radius: 6px;
-  
+  font-size: 18px;
+  font-weight: 800;
 }
 .input-field::placeholder{
-  color: yellow;
+  color: lightgreen;
   text-align: center;
   font-size: 18px;
+  font-weight: 800;
 }
 
 .classDisplay{
@@ -150,11 +149,12 @@ html,body{
   text-align: center;
   margin: 0;
   margin: auto auto;
-  margin-top: 20px;
+  margin-top: 40px;
   padding: 10px;
   height: 50px;
   font-size: 25px;
   transition-duration: 1s;
+  font-weight: 700;
 }
 
 .sign-button:hover,.submit-button:hover{
@@ -178,12 +178,14 @@ html,body{
   touch-action: none;
 }
 #clearCanvasBtn{
-  width: 80px;
+  width: 150px;
   height: 30px;
   padding: 3px;
   background-color: black;
   color: white;
-  font-size: 17px;
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: 7px;
 }
 #clearCanvasBtn:hover{
   background-color: #373636;
@@ -209,12 +211,13 @@ span {
   left: 0;
   transform: translateY(0%);
   width: 100%;
-  height: 500px;
+  height: 800px;
   background-color: white;
   border-top-right-radius: 10px;
   border-top-left-radius: 10px;
   text-align: center;
   transition-duration: 1.5s;
+  overflow: scroll;
 }
 .list-title{
   position: absolute;
@@ -299,3 +302,90 @@ span {
   overflow: hidden;
   transition: height 0.5s ease-in-out; /* Smooth transition */
 }
+
+.feedback-section{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-57%);
+  display: none;
+  width: 90%;
+  height: auto;
+  box-shadow: 0px 30px 30px  rgba(0, 200, 0, 0.4);
+  backdrop-filter: blur(20px);
+  border-radius: 15px;
+  text-align: center;
+}
+
+.feedback-form{
+  display: grid;
+  grid-template-columns: repeat(1,1fr);
+  grid-column-gap: 10px;
+  justify-items: center;
+  align-items: center;
+  width: 400px;
+  margin: 200px auto ;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 200, 0, 0.4);
+  text-align: center;
+}
+
+.form-text{
+  display: block;
+  border-radius: 10px;
+  padding: 10px;
+  margin: auto auto;
+  border-radius: 10px;
+}
+
+.input-name,.input-email{
+  display: block;
+  width: 50%;
+  height: 25px;
+  margin: 10px auto;
+  border: 1px solid green;
+  border-radius: 5px;
+}
+
+.send-but{
+  width: 60%;
+  margin: 25px auto;
+  text-align: center;
+  padding-left: 90px;
+}
+.feedback-cancle{
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-radius: 5px;
+  background: green;
+}
+.cancle-icon:hover{
+  stroke: yellow;
+}
+
+#review{
+  position: fixed;
+  top: 75px;
+  right: 10px;
+  z-index: 10;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  backdrop-filter: blur(10px);
+  color: black;
+  border-radius:5px;
+  width: 80px;
+  height: 30px;
+  line-height: 30px;
+  padding: 3px;
+  text-align: center;
+  border: 1px solid yellow;
+  font-weight: 600;
+}
+#review:hover{
+  background-color: green;
+  color: yellow;
+                                    }

@@ -11,10 +11,18 @@ import {
 
 const userRef = collection(db, "users");
 
-
-
 //beginning of the new code i added
 //......Time system for button...
+
+let state = false;
+const review = document.getElementById('review');
+const feedbackCancle = document.querySelector('.feedback-cancle');
+const feedbackSection = document.querySelector('.feedback-section');
+const feedbackName = document.querySelector('.input-name');
+const feedbackEmail = document.querySelector('.input-email');
+const feedbackTxt = document.querySelector('.form-text');
+
+
 let courseName;
 let endTime = 0;
 const DB = window.localStorage;
@@ -169,7 +177,7 @@ function checkAttendanceState() {
     case 5: // Friday
       if (hour >= 0 && hour < 10) changeCourse(0, 10, "PHY111");
       else if (hour >= 10 && hour < 12) changeCourse(10, 12, "PHY117");
-      else if (hour >= 12 && hour < 15) changeCourse(12, 15, "PHY112");
+      else if (hour >= 12 && hour < 18) changeCourse(12, 18, "PHY112");
       break;
     default :
       buttonState(true);
@@ -267,17 +275,61 @@ function updateAttendanceDisplay() {
   });
 }
 
+function displayReview(){
+  feedbackCancle.addEventListener('click',()=>{
+    feedbackSection.style.display = state? 'none':'block';
+    state = !state;
+  });
+  review.addEventListener('click',()=>{
+    feedbackSection.style.display = state? 'none':'block';
+    state = !state;
+  });
+  const feedbackForm = document.getElementById('feedback-form');
+  if(feedbackForm){
+    feedbackForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      
+      if(!navigator.onLine) return alert('You are offline.')
+      try{
+        const reviewTxt = collection(db,'review');
+        const name = feedbackName.value;
+        const email = feedbackEmail.value;
+        const text = feedbackTxt.value;
+        
+        if(!name || !text) return alert('make sure to enter your name and text message');
+        if(email){
+          await addDoc(reviewTxt,{
+            name:name,
+            email:email,
+            text:text,
+          });
+          alert('Sent successfully!')
+        }else{
+          await addDoc(reviewTxt,{
+            name:name,
+            text:text,
+          });
+          alert('Sent successfully!')
+        }
+      }catch(err){
+        console.log('Error message: '+ err);
+        alert('error sending message')
+      }
+    });
+  }
+}
+
 // --- Initialize on Load ---
 document.addEventListener("DOMContentLoaded", () => {
   checkAttendanceState();
   updateAttendanceDisplay();
   const navBar = document.querySelector(".nav-bar");
   if (navBar) navBar.style.top = "0%";
-  
+  //to display the review page for users to send me messages...
+  displayReview();
   submitButton.onclick = function(){
-    console.log('clicked!')
-    this.disabled ? alert('No class now!'): checkInputs()
+    console.log('clicked!');
+    this.disabled ? alert('No class now!'): checkInputs();
   }
 });
-
 

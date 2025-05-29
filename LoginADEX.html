@@ -4,9 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Attendance Login</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#007bff">
-  <link rel="icon" href="icon-192.png" />
   <style>
     body {
       margin: 0;
@@ -217,12 +214,6 @@
   </div>
   <script type="module" src="firebaseConfig.js"></script>
   <script type="module" src="LoginADEX.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./service-worker.js')
-      .then(reg => console.log('Service Worker registered:', reg.scope))
-      .catch(err => console.error('Service Worker failed:', err));
-    }
-  </script>
+
 </body>
 </html>

@@ -1,7 +1,7 @@
 {
   "name": "ADEX",
   "short_name": "ADEX",
-  "start_url": "./",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#007bff",
@@ -17,4 +17,4 @@
       "type": "image/png"
     }
   ]
-}
+    }

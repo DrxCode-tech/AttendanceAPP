@@ -197,5 +197,5 @@ loginButton.addEventListener('submit', async (e) => {
 const footer = document.querySelector('.footer');
 footer.addEventListener('click',()=>{
   clearUserData();
-  window.location.href = 'signADEX.html';
+  window.location.href = 'index.html';
 })

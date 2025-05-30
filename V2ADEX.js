@@ -123,7 +123,7 @@ window.addEventListener('DOMContentLoaded', () => {
       if (users) {
         displayUserDetails(users);
       } else {
-        window.location.href = 'loginADEX.html'; // redirect if not logged in
+        window.location.href = 'LoginADEX.html'; // redirect if not logged in
       }
     };
   };
@@ -183,7 +183,7 @@ function displayUserDetails(user) {
 
 //log out function
 document.querySelector('.log-out').addEventListener('click',()=>{
-  window.location.href = 'loginADEX.html';
+  window.location.href = 'LoginADEX.html';
 })
 //online checking programmes
 async function isReallyOnline() {

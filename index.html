@@ -99,8 +99,22 @@
 
   /* Status message styling */
   #statusMessage {
-    margin-top: 20px;
+    position: fixed;
+    top: -100%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: black;
+    border-radius: 10px;
     font-weight: 600;
+    width: 60%;
+    min-height: 40px;
+    height: auto;
+    z-index: 20;
+    transition-duration: 1s;
+    padding: 5px 2px;
   }
 
   /* Spinner container & spinner */
@@ -285,4 +299,4 @@
     }
   </script>
 </body>
-  </html>
+          </html>

@@ -11,6 +11,7 @@ import {
   setDoc,
 } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-firestore.js";
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
+import { sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";;
 
 // Initialization of inputs
 const signUpButton = document.getElementById('signupForm');
@@ -31,7 +32,9 @@ function statusDisplay(state, txt) {
   clearTimeout(inter);
   message.innerHTML = txt;
   message.style.color = state ? 'green' : 'red';
+  message.style.top = '15px';
   inter = setTimeout(() => {
+    message.style.top = '-100%';
     message.innerHTML = '';
   }, 7000);
 }
@@ -160,47 +163,68 @@ function isStrongPassword(password) {
 }
 
 // Checking if user exists on DB
-async function checkUser(regNm, level, dept) {
+async function checkUser(email, level, dept) {
   const collect = collection(db, `user_${level}`, 'department', dept);
   const snapUserData = await getDocs(collect);
-  return snapUserData.docs.some(doc => {
+  if(snapUserData.size > 0){
+    return snapUserData.docs.some(doc => {
     const docm = doc.data();
-    return standardizeRegNumber(docm.regNm).trim().toLowerCase() === regNm.trim().toLowerCase();
-  });
+    return doc.email === email;
+    }); 
+  }else{
+    console.error('no users found !');
+  }
+  
 }
 
-// Verify existing user and redirect
-async function verifyAndOpen(regNm, level, dept) {
+async function verifyAndOpen(email,regNm,level,dept){
   const collect = collection(db, `user_${level}`, 'department', dept);
-  try {
+  try{
     const snapUserData = await getDocs(collect);
-    const docum = snapUserData.docs.find(doc => standardizeRegNumber(doc.data().regNm) === regNm);
-    if (docum) {
-      const userDt = docum.data();
-      const newUser = {
-        uid: userDt.uid,
-        name: userDt.name,
-        regNm: userDt.regNm,
-        email: userDt.email,
-        dept: userDt.dept,
-        date: userDt.date,
-      };
-      storeUser(newUser);
+    if(snapUserData.size > 0){
+      const docum = snapUserData.docs.find(doc=>{
+      doc.data().email === email && standardizeRegNumber(doc.data().regNm) === regNm;
+      });
+      if (docum) {
+        const userDt = docum.data();
+        const newUser = {
+          uid: userDt.uid,
+          name: userDt.name,
+          regNm: userDt.regNm,
+          email: userDt.email,
+          dept: userDt.dept,
+          date: userDt.date,
+        };
+        storeUser(newUser);
+        spinner.style.display = 'none';
+        statusDisplay(true, "Welcome back!");
+        window.location.href = "V2ADEX.html";
+      }else{
+        return statusDisplay(false,'invalide email or regNumber!');
+        spinner.style.display = 'none';
+      }
+    }else{
+      console.error('Error no users! ' );
       spinner.style.display = 'none';
-      statusDisplay(true, "Welcome back!");
-      window.location.href = "V2ADEX.html";
     }
-  } catch (err) {
-    console.log('Error message: ' + err);
+  }catch(err){
+    statusDisplay(false,'Pls, check your internet connectivety!');
     spinner.style.display = 'none';
   }
 }
 
+
 // Sign up new user and store in Firebase & IndexedDB
+
+
 async function signUpUser(fullName, email, password, level, dept, regNm) {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
+
+    // ✅ Send verification email
+    await sendEmailVerification(user);
+
     const newUser = {
       uid: user.uid,
       name: fullName,
@@ -209,12 +233,16 @@ async function signUpUser(fullName, email, password, level, dept, regNm) {
       dept: dept,
       date: new Date().toISOString(),
     };
+
     const collect = collection(db, `user_${level}`, 'department', dept);
     await addDoc(collect, newUser);
+
     storeUser(newUser);
     spinner.style.display = 'none';
-    statusDisplay(true, 'User signed up successfully');
-    window.location.href = "V2ADEX.html";
+
+    statusDisplay(true, 'Verification email sent! Please verify before logging in.');
+
+    // 👇 Don’t send them to mark page yet — stay on sign-up page
   } catch (error) {
     spinner.style.display = 'none';
     if (error.code === "auth/email-already-in-use") {
@@ -260,7 +288,7 @@ signUpButton.addEventListener('submit', async (e) => {
   if(!navigator.onLine) return statusDisplay(false,'You are currently offline');
   
   const name = Name.value.trim();
-  const regNm = standardizeRegNumber(RegNM.value.trim());
+  const regNm = standardizeRegNumber(RegNM.value.trim()).toUpperCase();
   const department = Department.value.trim();
   const email = Email.value.trim();
   const levelInput = Level.value.trim();
@@ -291,9 +319,9 @@ signUpButton.addEventListener('submit', async (e) => {
   spinner.style.display = 'block';
 
   // Check if user already exists
-  const userPresence = await checkUser(regNm, levelInput, department);
+  const userPresence = await checkUser(email, levelInput, department);
   if (userPresence) {
-    await verifyAndOpen(regNm, levelInput, department);
+    await verifyAndOpen(email,regNm, levelInput, department);
     return;
   }
 

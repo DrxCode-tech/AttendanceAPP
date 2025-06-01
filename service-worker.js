@@ -8,6 +8,8 @@ const FILES_TO_CACHE = [
   '/V2ADEX.html',
   '/V2ADEX.js',
   '/V2ADEX.css',
+  'review.html',
+  'review.js',
   '/AboutADEX.html',
   '/firebaseConfig.js',
   '/icon-192.png',

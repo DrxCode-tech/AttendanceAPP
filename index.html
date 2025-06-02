@@ -248,7 +248,15 @@
   <button id="installButton" style="display: none; position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
     Install ADEX
   </button>
-
+  <!-- verifying email -->
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("verified") === "true") {
+      console.log("Redirected from email verification.");
+      alert("Your email was successfully verified. You can now create your account or log in.");
+    }
+  </script>
+  
   <script type="module" src="firebaseConfig.js"></script>
   <script type="module" src="signADEX.js"></script>
   <script>
@@ -299,4 +307,4 @@
     }
   </script>
 </body>
-          </html>
+                                                                                                                                                         </html>

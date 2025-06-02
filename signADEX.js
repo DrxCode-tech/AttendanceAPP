@@ -316,10 +316,10 @@ async function createUserAcct(user){
     await addDoc(collect, newUser);
 
     storeUser(newUser);
-    indexedDB.deleteDatabase('savedRecord');
     spinner.style.display = 'none';
-
-    statusDisplay(true, 'Verification email sent! Please verify before logging in.');
+    statusDisplay(true, 'SignUp successfully.');
+    indexedDB.deleteDatabase('savedRecord');
+    window.location.href = 'V2ADEX.html';
   }catch(err){
     statusDisplay(false,`Error adding user to database:${err.message} `)
   }

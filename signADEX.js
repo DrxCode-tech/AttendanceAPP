@@ -1,3 +1,4 @@
+'//signADEX.js
 import { db , auth } from "./firebaseConfig.js";
 import {
   query,
@@ -10,8 +11,7 @@ import {
   getDoc,
   setDoc,
 } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-firestore.js";
-import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
-import { sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";;
+import { createUserWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
 
 // Initialization of inputs
 const signUpButton = document.getElementById('signupForm');
@@ -26,6 +26,22 @@ const Password = document.getElementById('password');
 const message = document.getElementById('statusMessage');
 const spinner = document.querySelector('.spinner-container');
 
+//onload programming
+window.addEventListener('DOMContentLoaded', () => {
+  // Step 1: Load data from IndexedDB
+  getForVerification();
+
+  // Step 2: Wait for Firebase to load currentUser
+  onAuthStateChanged(auth, async (user) => {
+    if (user && user.emailVerified) {
+      console.log("User verified. Proceeding to create account...");
+      await createUserAcct(user); // Your function to finally create the account
+    } else {
+      console.log("User not verified yet or not logged in");
+    }
+  });
+});
+
 // Status function
 let inter;
 function statusDisplay(state, txt) {
@@ -37,6 +53,80 @@ function statusDisplay(state, txt) {
     message.style.top = '-100%';
     message.innerHTML = '';
   }, 7000);
+}
+
+//update create Acct page!
+function updateCreateAcctPage(name, regNm, dept, level, email, password) {
+  Name.value = name;
+  RegNM.value = regNm;
+  Department.value = dept;
+  Level.value = level;
+  Email.value = email;
+  Password.value = password;
+}
+
+// Save data into IndexedDB
+function saveForVerification(name, regNm, dept, level, email, password) {
+  const saveUser = { name, regNm, dept, level, email, password };
+  const request = indexedDB.open('savedRecord', 1); // version required for onupgradeneeded
+
+  request.onupgradeneeded = function (e) {
+    const idb = e.target.result;
+    if (!idb.objectStoreNames.contains('saved_record')) {
+      idb.createObjectStore('saved_record');
+    }
+  };
+
+  request.onsuccess = function (e) {
+    const idb = e.target.result;
+
+    const trx = idb.transaction('saved_record', 'readwrite');
+    const store = trx.objectStore('saved_record');
+    const saveRequest = store.put(saveUser, 'saveUser');
+
+    saveRequest.onsuccess = function () {
+      console.log('Saved successfully');
+    };
+    saveRequest.onerror = (e) => {
+      console.error('Error saving', e.target.error.message);
+    };
+  };
+
+  request.onerror = (e) => {
+    console.error('Error opening savedRecord DB', e.target.error.message);
+  };
+}
+
+// Load data back from IndexedDB and fill page
+function getForVerification() {
+  const request = indexedDB.open('savedRecord');
+
+  request.onsuccess = function (e) {
+    const idb = e.target.result;
+
+    const trx = idb.transaction('saved_record', 'readonly');
+    const store = trx.objectStore('saved_record');
+    const getRequest = store.get('saveUser');
+
+    getRequest.onsuccess = () => {
+      const result = getRequest.result;
+      if (result) {
+        const { name, regNm, dept, level, email, password } = result;
+        updateCreateAcctPage(name, regNm, dept, level, email, password);
+        console.log('Page data displayed successfully');
+      } else {
+        console.log('No saved user data found.');
+      }
+    };
+
+    getRequest.onerror = (e) => {
+      console.error('Error getting saved user', e.target.error.message);
+    };
+  };
+
+  request.onerror = (e) => {
+    console.error('Error opening DB for reading', e.target.error.message);
+  };
 }
 
 // Ensure DB and store exist, then check if user exists
@@ -183,7 +273,7 @@ async function verifyAndOpen(email,regNm,level,dept){
     const snapUserData = await getDocs(collect);
     if(snapUserData.size > 0){
       const docum = snapUserData.docs.find(doc=>{
-      doc.data().email === email && standardizeRegNumber(doc.data().regNm) === regNm;
+      return doc.data().email === email && standardizeRegNumber(doc.data().regNm) === regNm;
       });
       if (docum) {
         const userDt = docum.data();
@@ -215,36 +305,52 @@ async function verifyAndOpen(email,regNm,level,dept){
 
 
 // Sign up new user and store in Firebase & IndexedDB
+async function createUserAcct(user){
+  const name = Name.value.trim();
+  const regNm = standardizeRegNumber(RegNM.value.trim()).toUpperCase();
+  const dept = Department.value.trim();
+  const email = Email.value.trim();
+  const level = Level.value.trim();
+  
+  const newUser = {
+    uid: user.uid,
+    name,
+    regNm,
+    email,
+    dept,
+    date: new Date().toISOString(),
+  };
+  
+  try{
+    const collect = collection(db, `user_${level}`, 'department', dept);
+    await addDoc(collect, newUser);
 
+    storeUser(newUser);
+    indexedDB.deleteDatabase('savedRecord');
+    spinner.style.display = 'none';
+
+    statusDisplay(true, 'Verification email sent! Please verify before logging in.');
+  }catch(err){
+    statusDisplay(false,`Error adding user to database:${err.message} `)
+  }
+}
 
 async function signUpUser(fullName, email, password, level, dept, regNm) {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // ✅ Send verification email
-    await sendEmailVerification(user);
-
-    const newUser = {
-      uid: user.uid,
-      name: fullName,
-      regNm: regNm,
-      email: email,
-      dept: dept,
-      date: new Date().toISOString(),
-    };
-
-    const collect = collection(db, `user_${level}`, 'department', dept);
-    await addDoc(collect, newUser);
-
-    storeUser(newUser);
+    await sendEmailVerification(user, {url: 'https://drxcode-tech.github.io/AttendanceAPP/index.html?verified=true', 
+    // your create account page URL
+    handleCodeInApp: false
+    });
+    statusDisplay(true, 'Verification email sent! Please check your inbox.');
     spinner.style.display = 'none';
 
-    statusDisplay(true, 'Verification email sent! Please verify before logging in.');
-
-    // 👇 Don’t send them to mark page yet — stay on sign-up page
+    saveForVerification(fullName,regNm,dept,level,email,password);
   } catch (error) {
     spinner.style.display = 'none';
+
     if (error.code === "auth/email-already-in-use") {
       statusDisplay(false, "Email already registered.");
     } else {
@@ -253,7 +359,6 @@ async function signUpUser(fullName, email, password, level, dept, regNm) {
     }
   }
 }
-
 document.addEventListener('DOMContentLoaded', () => {
   initAndCheckUser(function(userExists) {
     if (userExists) {

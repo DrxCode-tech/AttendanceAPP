@@ -1,5 +1,5 @@
-'//signADEX.js
-import { db , auth } from "./firebaseConfig.js";
+//signADEX.js
+import { db, auth } from "./firebaseConfig.js";
 import {
   query,
   getDocs,
@@ -11,7 +11,11 @@ import {
   getDoc,
   setDoc,
 } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-firestore.js";
-import { createUserWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
 
 // Initialization of inputs
 const signUpButton = document.getElementById('signupForm');
@@ -26,21 +30,7 @@ const Password = document.getElementById('password');
 const message = document.getElementById('statusMessage');
 const spinner = document.querySelector('.spinner-container');
 
-//onload programming
-window.addEventListener('DOMContentLoaded', () => {
-  // Step 1: Load data from IndexedDB
-  getForVerification();
 
-  // Step 2: Wait for Firebase to load currentUser
-  onAuthStateChanged(auth, async (user) => {
-    if (user && user.emailVerified) {
-      console.log("User verified. Proceeding to create account...");
-      await createUserAcct(user); // Your function to finally create the account
-    } else {
-      console.log("User not verified yet or not logged in");
-    }
-  });
-});
 
 // Status function
 let inter;
@@ -68,7 +58,7 @@ function updateCreateAcctPage(name, regNm, dept, level, email, password) {
 // Save data into IndexedDB
 function saveForVerification(name, regNm, dept, level, email, password) {
   const saveUser = { name, regNm, dept, level, email, password };
-  const request = indexedDB.open('savedRecord', 1); // version required for onupgradeneeded
+  const request = indexedDB.open('savedRecord'); // version required for onupgradeneeded
 
   request.onupgradeneeded = function (e) {
     const idb = e.target.result;
@@ -134,19 +124,19 @@ function initAndCheckUser(callback) {
   const request = indexedDB.open("adexDBusers", 1);
 
   request.onupgradeneeded = function(event) {
-    const db = event.target.result;
+    const idb = event.target.result;
 
     // Create "users" store if it doesn't exist
-    if (!db.objectStoreNames.contains("users")) {
-      db.createObjectStore("users"); // Manual key needed
+    if (!idb.objectStoreNames.contains("users")) {
+      idb.createObjectStore("users"); // Manual key needed
     }
   };
 
   request.onsuccess = function(event) {
-    const db = event.target.result;
+    const idb = event.target.result;
 
     // Now safe to check if user exists
-    const tx = db.transaction("users", "readonly");
+    const tx = idb.transaction("users", "readonly");
     const store = tx.objectStore("users");
 
     const getRequest = store.get("currentUser");
@@ -158,13 +148,13 @@ function initAndCheckUser(callback) {
         console.log("No user found.");
         callback(false);
       }
-      db.close();
+      idb.close();
     };
 
     getRequest.onerror = function() {
       console.error("Error reading from IndexedDB.");
       callback(false);
-      db.close();
+      idb.close();
     };
   };
 
@@ -259,7 +249,7 @@ async function checkUser(email, level, dept) {
   if(snapUserData.size > 0){
     return snapUserData.docs.some(doc => {
     const docm = doc.data();
-    return doc.email === email;
+    return docm.email === email;
     }); 
   }else{
     console.error('no users found !');
@@ -294,7 +284,7 @@ async function verifyAndOpen(email,regNm,level,dept){
         spinner.style.display = 'none';
       }
     }else{
-      console.error('Error no users! ' );
+      console.error('Error no users! ',error.message );
       spinner.style.display = 'none';
     }
   }catch(err){
@@ -307,7 +297,7 @@ async function verifyAndOpen(email,regNm,level,dept){
 // Sign up new user and store in Firebase & IndexedDB
 async function createUserAcct(user){
   const name = Name.value.trim();
-  const regNm = standardizeRegNumber(RegNM.value.trim()).toUpperCase();
+  const regNm = standardizeRegNumber(RegNM.value.trim().toUpperCase());
   const dept = Department.value.trim();
   const email = Email.value.trim();
   const level = Level.value.trim();
@@ -360,6 +350,20 @@ async function signUpUser(fullName, email, password, level, dept, regNm) {
   }
 }
 document.addEventListener('DOMContentLoaded', () => {
+  
+  // Step 1: Load data from IndexedDB
+  getForVerification();
+
+  // Step 2: Wait for Firebase to load currentUser
+  onAuthStateChanged(auth, async (user) => {
+    if (user && user.emailVerified) {
+      console.log("User verified. Proceeding to create account...");
+      await createUserAcct(user); // Your function to finally create the account
+    } else {
+      console.log("User not verified yet or not logged in");
+    }
+  });
+  
   initAndCheckUser(function(userExists) {
     if (userExists) {
       document.querySelector('.spinner-container1').style.display = 'flex';

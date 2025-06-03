@@ -177,7 +177,7 @@ window.addEventListener('DOMContentLoaded', () => {
 function displayUserDetails(user) {
   document.getElementById('userName').textContent = user.name || 'USER NAME';
   document.getElementById('regNumber').textContent = user.regNm || 'USER_REG NUMBER';
-  document.querySelector('.user-nm').innerHTML = user.name || `<a href="loginADEX.html">Login</a>`;
+  document.querySelector('.user-nm').innerHTML = user.name || `<a href="LoginADEX.html">Login</a>`;
   document.querySelector('.department').textContent = user.dept || 'Department';
 }
 

@@ -93,6 +93,11 @@ function getForVerification() {
 
   request.onsuccess = function (e) {
     const idb = e.target.result;
+    
+    if(!idb.objectStoreNames.contains('saved_record')){
+      console.log('no new user yet...proceed');
+      return;
+    }
 
     const trx = idb.transaction('saved_record', 'readonly');
     const store = trx.objectStore('saved_record');
@@ -104,6 +109,15 @@ function getForVerification() {
         const { name, regNm, dept, level, email, password } = result;
         updateCreateAcctPage(name, regNm, dept, level, email, password);
         console.log('Page data displayed successfully');
+        
+        onAuthStateChanged(auth, async (user) => {
+          if (user && user.emailVerified) {
+            console.log("User verified. Proceeding to create account...");
+            await createUserAcct(user); // Your function to finally create the account
+          } else {
+            console.log("User not verified yet or not logged in");
+          }
+        });
       } else {
         console.log('No saved user data found.');
       }
@@ -351,19 +365,6 @@ async function signUpUser(fullName, email, password, level, dept, regNm) {
 }
 document.addEventListener('DOMContentLoaded', () => {
   
-  // Step 1: Load data from IndexedDB
-  getForVerification();
-
-  // Step 2: Wait for Firebase to load currentUser
-  onAuthStateChanged(auth, async (user) => {
-    if (user && user.emailVerified) {
-      console.log("User verified. Proceeding to create account...");
-      await createUserAcct(user); // Your function to finally create the account
-    } else {
-      console.log("User not verified yet or not logged in");
-    }
-  });
-  
   initAndCheckUser(function(userExists) {
     if (userExists) {
       document.querySelector('.spinner-container1').style.display = 'flex';
@@ -388,6 +389,8 @@ document.addEventListener('DOMContentLoaded', () => {
     eyeOpen.style.display = isHidden ? 'inline' : 'none';
     eyeClosed.style.display = isHidden ? 'none' : 'inline';
   });
+  
+  getForVerification();
 });
 
 // Form submission mechanism

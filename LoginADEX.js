@@ -172,7 +172,7 @@ loginButton.addEventListener('submit', async (e) => {
     if (!userData) {
       spin.style.display = 'none';
       statusDisplay(false, 'User not found. Please sign up.');
-      return window.location.href = 'signADEX.html';
+      return window.location.href = 'index.html';
     }
 
     if (userData.email === email && userData.regNm === regNm) {
@@ -186,7 +186,7 @@ loginButton.addEventListener('submit', async (e) => {
     }else {
       spin.style.display = 'none';
       statusDisplay(false, 'Credentials do not match our records.');
-      setTimeout(() => window.location.href = 'signADEX.html', 1500);
+      setTimeout(() => window.location.href = 'index.html', 1500);
     }
   } catch (err) {
     spin.style.display = 'none';

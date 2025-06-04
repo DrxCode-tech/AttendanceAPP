@@ -340,14 +340,18 @@ async function createUserAcct(user){
 }
 
 async function signUpUser(fullName, email, password, level, dept, regNm) {
+  localeStorage.setItem('fetch','it works');
+  
   saveForVerification(fullName,regNm,dept,level,email,password);
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    await sendEmailVerification(user, {url: 'https://drxcode-tech.github.io/AttendanceAPP/index.html?verified=true', 
+    await sendEmailVerification(user, {
+      handleCodeInApp: true,
+      url: 'https://drxcode-tech.github.io/AttendanceAPP/index.html?verified=true', 
     // your create account page URL
-    handleCodeInApp: true,
+    
     });
     statusDisplay(true, 'Verification email sent! Please check your inbox.');
     spinner.style.display = 'none';
@@ -365,7 +369,8 @@ async function signUpUser(fullName, email, password, level, dept, regNm) {
   }
 }
 document.addEventListener('DOMContentLoaded', () => {
-  
+  const sta = localeStorage.getItem('fetch');
+  if(sta) alert(sta);
   initAndCheckUser(function(userExists) {
     if (userExists) {
       document.querySelector('.spinner-container1').style.display = 'flex';

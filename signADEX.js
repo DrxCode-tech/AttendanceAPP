@@ -340,6 +340,7 @@ async function createUserAcct(user){
 }
 
 async function signUpUser(fullName, email, password, level, dept, regNm) {
+  saveForVerification(fullName,regNm,dept,level,email,password);
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
@@ -351,7 +352,7 @@ async function signUpUser(fullName, email, password, level, dept, regNm) {
     statusDisplay(true, 'Verification email sent! Please check your inbox.');
     spinner.style.display = 'none';
 
-    saveForVerification(fullName,regNm,dept,level,email,password);
+    
   } catch (error) {
     spinner.style.display = 'none';
 

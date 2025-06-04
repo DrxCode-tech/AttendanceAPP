@@ -112,7 +112,7 @@ function getForVerification() {
         
         onAuthStateChanged(auth, async (user) => {
           if (user && user.emailVerified) {
-            console.log("User verified. Proceeding to create account...");
+            alert("User verified. Proceeding to create account...");
             await createUserAcct(user); // Your function to finally create the account
           } else {
             console.log("User not verified yet or not logged in");

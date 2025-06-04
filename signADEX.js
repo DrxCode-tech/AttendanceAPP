@@ -346,7 +346,7 @@ async function signUpUser(fullName, email, password, level, dept, regNm) {
 
     await sendEmailVerification(user, {url: 'https://drxcode-tech.github.io/AttendanceAPP/index.html?verified=true', 
     // your create account page URL
-    handleCodeInApp: false
+    handleCodeInApp: true,
     });
     statusDisplay(true, 'Verification email sent! Please check your inbox.');
     spinner.style.display = 'none';

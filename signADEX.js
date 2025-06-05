@@ -46,7 +46,7 @@ function statusDisplay(state, txt) {
 }
 
 //update create Acct page!
-function updateCreateAcctPage(name, regNm, dept, level, email, password) {
+/*function updateCreateAcctPage(name, regNm, dept, level, email, password) {
   Name.value = name;
   RegNM.value = regNm;
   Department.value = dept;
@@ -73,7 +73,8 @@ function saveForVerification(name, regNm, dept, level, email, password) {
     const trx = idb.transaction('saved_record', 'readwrite');
     const store = trx.objectStore('saved_record');
     const saveRequest = store.put(saveUser, 'saveUser');
-
+    console.log(saveUser);
+    
     saveRequest.onsuccess = function () {
       console.log('Saved successfully');
     };
@@ -89,6 +90,7 @@ function saveForVerification(name, regNm, dept, level, email, password) {
 
 // Load data back from IndexedDB and fill page
 function getForVerification() {
+  alert('lì');
   const request = indexedDB.open('savedRecord');
 
   request.onsuccess = function (e) {
@@ -112,7 +114,7 @@ function getForVerification() {
         
         onAuthStateChanged(auth, async (user) => {
           if (user && user.emailVerified) {
-            alert("User verified. Proceeding to create account...");
+            console.log("User verified. Proceeding to create account...");
             await createUserAcct(user); // Your function to finally create the account
           } else {
             console.log("User not verified yet or not logged in");
@@ -131,7 +133,7 @@ function getForVerification() {
   request.onerror = (e) => {
     console.error('Error opening DB for reading', e.target.error.message);
   };
-}
+}*/
 
 // Ensure DB and store exist, then check if user exists
 function initAndCheckUser(callback) {
@@ -309,13 +311,7 @@ async function verifyAndOpen(email,regNm,level,dept){
 
 
 // Sign up new user and store in Firebase & IndexedDB
-async function createUserAcct(user){
-  const name = Name.value.trim();
-  const regNm = standardizeRegNumber(RegNM.value.trim().toUpperCase());
-  const dept = Department.value.trim();
-  const email = Email.value.trim();
-  const level = Level.value.trim();
-  
+async function createUserAcct(user,name,regNm,email,dept,level){
   const newUser = {
     uid: user.uid,
     name,
@@ -340,19 +336,17 @@ async function createUserAcct(user){
 }
 
 async function signUpUser(fullName, email, password, level, dept, regNm) {
-  localeStorage.setItem('fetch','it works');
-  
-  saveForVerification(fullName,regNm,dept,level,email,password);
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    await sendEmailVerification(user, {
-      handleCodeInApp: true,
-      url: 'https://drxcode-tech.github.io/AttendanceAPP/index.html?verified=true', 
+    /*await sendEmailVerification(user, {url: 'https://drxcode-tech.github.io/AttendanceAPP/index.html?verified=true', 
     // your create account page URL
-    
+    handleCodeInApp: true,
     });
+    saveForVerification(fullName,regNm,dept,level,email,password);*/
+    await createUserAcct(user,fullName,regNm,email,dept,level);
+    
     statusDisplay(true, 'Verification email sent! Please check your inbox.');
     spinner.style.display = 'none';
 
@@ -369,8 +363,7 @@ async function signUpUser(fullName, email, password, level, dept, regNm) {
   }
 }
 document.addEventListener('DOMContentLoaded', () => {
-  const sta = localeStorage.getItem('fetch');
-  if(sta) alert(sta);
+  
   initAndCheckUser(function(userExists) {
     if (userExists) {
       document.querySelector('.spinner-container1').style.display = 'flex';
@@ -396,7 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
     eyeClosed.style.display = isHidden ? 'none' : 'inline';
   });
   
-  getForVerification();
+  /*getForVerification();*/
 });
 
 // Form submission mechanism

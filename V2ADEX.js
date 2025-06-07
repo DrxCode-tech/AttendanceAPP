@@ -342,6 +342,7 @@ async function getGeoLocsUI() {
   try {
     for (let i = 0; i < 5; i++) {
       const { latitude, longitude } = await getLocation();
+      alert(latitude+""+longitude);
       userLocs.push({ latitude, longitude });
     }
 

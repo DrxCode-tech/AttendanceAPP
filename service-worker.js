@@ -1,4 +1,4 @@
-const CACHE_NAME = 'adex-cache-v3';
+/*const CACHE_NAME = 'adex-cache-v3';
 const FILES_TO_CACHE = [
   '/',
   '/index.html',
@@ -73,3 +73,4 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+*/

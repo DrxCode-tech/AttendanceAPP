@@ -396,16 +396,22 @@ markBt.addEventListener('click',async (e)=>{
   const department = (Department.textContent.trim() !== 'Department') ? Department.textContent.trim() : false;
   const course = (currentCourseDisplay.textContent.trim() !== 'No class') ? currentCourseDisplay.textContent.trim() : false;
   
-  if(!name || !regNm || !department || !course) return alert('All ADEX forms must be meet!');
+  if(!name || !regNm || !department || !course) return alert('All ADEX field must be filled!');
   
-  if(!navigator.geolocation) return statusDisplay(false,'Geolocation is not surpport by your brower!');
+  if(!navigator.geolocation) return statusDisplay(false,'Geolocation is not supported by your brower!');
   spinnerContainer.style.display = 'block';
-  const verifyGeo = await getGeoLocsUI();
-  if(!verifyGeo){
-    spinnerContainer.style.display = 'none';
-    statusDisplay(false,'Warning you are not in class!');
-    return
+  try{
+    const verifyGeo = await getGeoLocsUI();
+    if(!verifyGeo){
+      spinnerContainer.style.display = 'none';
+      statusDisplay(false,'Warning you are not in class!');
+      return;
+    }
+  }catch(err){
+    statusDisplay(false,'Internet error check connection');
+    return;
   }
+  
   
   const date = getCurrentDate();
   
@@ -419,7 +425,7 @@ markBt.addEventListener('click',async (e)=>{
   }catch(err){
     spinnerContainer.style.display = 'none';
     console.log('Error checking internet connection',err);
-    alert('Error checking internet connection'+ err);
+    alert('Error checking internet connection');
   }
   
 })
@@ -543,4 +549,4 @@ function trySyncStoredAttendance(db, interval) {
       console.error("Failed to read from IndexedDB during sync.");
     };
   });
-}
+  }

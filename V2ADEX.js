@@ -484,7 +484,7 @@ function deleteAdexDB() {
 
   deleteRequest.onsuccess = function () {
     console.log("adexDB successfully deleted.");
-    alert("Offline attendance data deleted successfully.");
+    alert("Offline attendance data synced and Marked successfully.");
   };
 
   deleteRequest.onerror = function (event) {

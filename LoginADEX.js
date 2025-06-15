@@ -187,6 +187,7 @@ loginButton.addEventListener('submit', async (e) => {
     }else {
       spin.style.display = 'none';
       statusDisplay(false, 'Credentials do not match our records.');
+      clearUserData();
       setTimeout(() => window.location.href = 'index.html', 1500);
     }
   } catch (err) {

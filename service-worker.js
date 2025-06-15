@@ -1,4 +1,4 @@
-/*const CACHE_NAME = 'adex-cache-v3';
+const CACHE_NAME = 'adex-cache-v4'; // Bump version whenever you update
 const FILES_TO_CACHE = [
   '/',
   '/index.html',
@@ -21,56 +21,64 @@ const FILES_TO_CACHE = [
 self.addEventListener('install', (event) => {
   console.log('[ServiceWorker] Install');
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('[ServiceWorker] Caching app shell');
-        return cache.addAll(FILES_TO_CACHE);
-      })
-      .then(() => self.skipWaiting()) // Activate immediately after install
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('[ServiceWorker] Caching app shell');
+      return cache.addAll(FILES_TO_CACHE);
+    }).then(() => self.skipWaiting()) // Skip waiting, activate immediately
   );
 });
 
-// Activate event: clean up old caches
+// Activate event: delete old caches
 self.addEventListener('activate', (event) => {
   console.log('[ServiceWorker] Activate');
   event.waitUntil(
-    caches.keys()
-      .then((keyList) => Promise.all(
+    caches.keys().then((keyList) => {
+      return Promise.all(
         keyList.map((key) => {
           if (key !== CACHE_NAME) {
             console.log('[ServiceWorker] Removing old cache:', key);
             return caches.delete(key);
           }
         })
-      ))
-      .then(() => self.clients.claim()) // Take control of clients immediately
+      );
+    }).then(() => self.clients.claim()) // Take control immediately
   );
 });
 
-// Fetch event: serve from cache first, then network fallback
+// Fetch event: cache-first strategy
 self.addEventListener('fetch', (event) => {
-  // Ignore non-GET requests
-  if (event.request.method !== 'GET') {
-    return;
-  }
+  if (event.request.method !== 'GET') return;
+
   event.respondWith(
-    caches.match(event.request)
-      .then((cachedResponse) => {
-        if (cachedResponse) {
-          // Return cached response if found
-          return cachedResponse;
-        }
-        // Otherwise fetch from network
-        return fetch(event.request)
-          .then((networkResponse) => {
-            // Optionally cache new requests here if needed
-            return networkResponse;
-          });
-      })
-      .catch(() => {
-        // Optional: return a fallback page/image for offline use
-        // return caches.match('/offline.html');
-      })
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      return fetch(event.request).then((networkResponse) => {
+        // Optionally cache new requests here
+        return networkResponse;
+      });
+    }).catch(() => {
+      // Offline fallback (optional)
+      // return caches.match('/offline.html');
+    })
   );
 });
-*/
+
+// Optional: Notify client of new version
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    clients.matchAll().then((clients) => {
+      clients.forEach((client) => {
+        client.postMessage({ type: 'UPDATE_AVAILABLE' });
+      });
+    })
+  );
+});

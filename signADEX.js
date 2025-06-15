@@ -363,7 +363,25 @@ async function signUpUser(fullName, email, password, level, dept, regNm) {
   }
 }
 document.addEventListener('DOMContentLoaded', () => {
-  
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(reg => {
+          console.log('Service Worker registered:', reg);
+
+          // Listen for update notification
+          navigator.serviceWorker.addEventListener('message', (event) => {
+            if (event.data?.type === 'UPDATE_AVAILABLE') {
+              const confirmed = confirm("A new version is available. Reload now?");
+              if (confirmed) {
+                window.location.reload();
+              }
+            }
+          });
+        })
+        .catch(err => console.error('Service Worker registration failed:', err));
+    });
+  }
   initAndCheckUser(function(userExists) {
     if (userExists) {
       document.querySelector('.spinner-container1').style.display = 'flex';

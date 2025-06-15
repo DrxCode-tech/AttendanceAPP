@@ -96,7 +96,7 @@ async function findUserInFirestore(uid, dept) {
     }
   }
 
-  return null;
+  return false;
 }
 
 function clearUserData() {

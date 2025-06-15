@@ -313,6 +313,7 @@ async function markAttendance(name, reg, dept, course, date) {
 }
 
 //geolocation
+/*
 async function getGeoLocsUI() {
   const userLocs = [];
   const coor = [5.0385, 7.9754, 5.0398, 7.9765];
@@ -365,7 +366,7 @@ async function getGeoLocsUI() {
   } catch (err) {
     statusDisplay(false,`⚠️ Location error: ${err.message}`);
   }
-}
+}*/
 
 async function batchMarkAttendance(studentList, course, date) {
   const batch = writeBatch(db);
@@ -398,7 +399,7 @@ markBt.addEventListener('click',async (e)=>{
   
   if(!name || !regNm || !department || !course) return alert('All ADEX field must be filled!');
   
-  if(!navigator.geolocation) return statusDisplay(false,'Geolocation is not supported by your brower!');
+  /*if(!navigator.geolocation) return statusDisplay(false,'Geolocation is not supported by your brower!');
   spinnerContainer.style.display = 'block';
   try{
     const verifyGeo = await getGeoLocsUI();
@@ -411,7 +412,7 @@ markBt.addEventListener('click',async (e)=>{
     statusDisplay(false,'Internet error check connection');
     return;
   }
-  
+  */
   
   const date = getCurrentDate();
   
@@ -549,4 +550,4 @@ function trySyncStoredAttendance(db, interval) {
       console.error("Failed to read from IndexedDB during sync.");
     };
   });
-  }
+}

@@ -172,6 +172,7 @@ loginButton.addEventListener('submit', async (e) => {
     if (!userData) {
       spin.style.display = 'none';
       statusDisplay(false, 'User not found. Please sign up.');
+      clearUserData();
       return window.location.href = 'index.html';
     }
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'adex-cache-v5'; // Bump version whenever you update
+const CACHE_NAME = 'adex-cache-v6'; // Bump version whenever you update
 const FILES_TO_CACHE = [
   '/',
   '/index.html',

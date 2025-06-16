@@ -218,12 +218,13 @@ function checkAttendanceState() {
   switch (day) {
     case 1: // Monday
       if (hour >= 8 && hour < 10) changeCourse(8, 10, "GST121");
+      else if (hour >= 13 && hour < 14) changeCourse(13, 14, "GET121");
       else if (hour >= 14 && hour < 16) changeCourse(14, 16, "CHM121");
       break;
     case 2: // Tuesday
       if (hour >= 8 && hour < 10) changeCourse(8, 10, "MTH122");
       else if (hour >= 10 && hour < 12) changeCourse(10, 12, "PHY128");
-      else if (hour >= 13 && hour < 15) changeCourse(13, 15, "PHY128");
+      else if (hour >= 13 && hour < 15) changeCourse(13, 15, "GST121");
       else if (hour >= 15 && hour < 17) changeCourse(15, 17, "STA121");
       break;
     case 3: // Wednesday
@@ -232,12 +233,14 @@ function checkAttendanceState() {
       else if (hour >= 15 && hour < 17) changeCourse(15, 17, "PHY121");
       break;
     case 4: // Thursday
-      if (hour >= 0 && hour < 20) changeCourse(0, 20, "CHM123");
+      if (hour >= 8 && hour < 10) changeCourse(8, 10, "CHM123");
       break;
     case 5: // Friday
       if (hour >= 8 && hour < 10) changeCourse(8, 10, "PHY122");
-      else if (hour >= 11 && hour < 18) changeCourse(
-        11, 18, "CPE002");
+      else if (hour >= 10 && hour < 12) changeCourse(
+        10, 12, "GET121");
+      else if (hour >= 13 && hour < 14) changeCourse(13, 14, "MTH122");
+      else if (hour >= 14 && hour < 16) changeCourse(14, 16, "GET121");
       break;
     default :
       alert('No classes today')
@@ -398,6 +401,22 @@ markBt.addEventListener('click',async (e)=>{
   const course = (currentCourseDisplay.textContent.trim() !== 'No class') ? currentCourseDisplay.textContent.trim() : false;
   
   if(!name || !regNm || !department || !course) return alert('All ADEX field must be filled!');
+
+  const course = course.replace(/\s+/g, '').toUpperCase();
+  const courseArr = [/PHY122/,/CHM123/, /PHY121/, /CPE121/, /MTH121/, /STA121/, /PHY128/,/MTH122/, /GST121/];
+  const courseIndex = ['PHY122', 'CHM123', 'PHY121', 'CPE121', 'MTH121', 'STA121', 'PHY128', 'MTH122', 'GST121'];
+  let truth = false;
+  for(const regex of courseArr){
+    if(regex.test(course)){
+      let index = courseArr.findIndex(item=> item === regex);
+      course = courseIndex[index];
+      truth = true;
+      break;
+    }
+  }
+  if(!truth){
+    return alert('Pls enter a valid course name...');
+  }
   
   /*if(!navigator.geolocation) return statusDisplay(false,'Geolocation is not supported by your brower!');
   spinnerContainer.style.display = 'block';
@@ -413,7 +432,7 @@ markBt.addEventListener('click',async (e)=>{
     return;
   }
   */
-  
+  spinnerContainer.style.display = 'block';
   const date = getCurrentDate();
   
   //check internet connection...

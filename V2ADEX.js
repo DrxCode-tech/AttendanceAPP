@@ -403,20 +403,7 @@ markBt.addEventListener('click',async (e)=>{
   if(!name || !regNm || !department || !course) return alert('All ADEX field must be filled!');
 
   const course = course.replace(/\s+/g, '').toUpperCase();
-  const courseArr = [/PHY122/,/CHM123/, /PHY121/, /CPE121/, /MTH121/, /STA121/, /PHY128/,/MTH122/, /GST121/];
-  const courseIndex = ['PHY122', 'CHM123', 'PHY121', 'CPE121', 'MTH121', 'STA121', 'PHY128', 'MTH122', 'GST121'];
-  let truth = false;
-  for(const regex of courseArr){
-    if(regex.test(course)){
-      let index = courseArr.findIndex(item=> item === regex);
-      course = courseIndex[index];
-      truth = true;
-      break;
-    }
-  }
-  if(!truth){
-    return alert('Pls enter a valid course name...');
-  }
+  
   
   /*if(!navigator.geolocation) return statusDisplay(false,'Geolocation is not supported by your brower!');
   spinnerContainer.style.display = 'block';

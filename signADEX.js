@@ -30,8 +30,6 @@ const Password = document.getElementById('password');
 const message = document.getElementById('statusMessage');
 const spinner = document.querySelector('.spinner-container');
 
-indexedDB.deleteDatabase('adexDBusers',1);
-
 // Status function
 let inter;
 function statusDisplay(state, txt) {

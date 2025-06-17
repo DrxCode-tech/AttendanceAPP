@@ -364,6 +364,25 @@ async function signUpUser(fullName, email, password, level, dept, regNm) {
 }
 document.addEventListener('DOMContentLoaded', () => {
   if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    for (let reg of registrations) {
+      reg.unregister().then(() => {
+        console.log('✅ Service worker unregistered');
+      });
+    }
+  });
+
+  // Clear caches
+  if (window.caches) {
+    caches.keys().then((names) => {
+      for (let name of names) {
+        caches.delete(name);
+        console.log(`🗑️ Cache ${name} deleted`);
+      }
+    });
+  }
+  }
+  /*if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/service-worker.js')
         .then(reg => {
@@ -381,7 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(err => console.error('Service Worker registration failed:', err));
     });
-  }
+  }*/
   initAndCheckUser(function(userExists) {
     if (userExists) {
       document.querySelector('.spinner-container1').style.display = 'flex';

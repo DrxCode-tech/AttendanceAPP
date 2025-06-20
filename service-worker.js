@@ -1,3 +1,15 @@
+self.addEventListener('install', (event) => {
+  self.skipWaiting(); // Force activation
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.map(key => caches.delete(key))) // Clear old caches
+    )
+  );
+});
+
 /*const CACHE_NAME = 'adex-cache-v6'; // Bump version whenever you update
 const FILES_TO_CACHE = [
   '/',
@@ -52,6 +64,9 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
+
+
+      
         return cachedResponse;
       }
 
